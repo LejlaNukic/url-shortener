@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>URL Shortener help page</title>
+</head>
+<body>
+    <h1>Dobro došli na stranicu sa uputama</h1>
+
+    <h2>Osnovne informacije</h2>
+    <p>Kreirani servisi služe za skraćivanje URL-ova, sa sljedećim funkcionalnostima:
+        <ul>
+            <li>Registracija web adrese</li>
+            <li>Redirect klijenta u skladu sa skraćenim url-om</li>
+            <li>Statistika posjeta</li>
+        </ul>
+    </p>
+
+    <h2>DEMO podaci</h2>
+    <p>Postoje dodani fake account i urlMapping objekti kao bootstap podaci.
+        <ul>
+            <li>
+                Npr. korisnici sa podacima:
+                accountId: "user" i password: "password",
+                accountId: "lejla" i password: "1dvatri!",
+            </li>
+            <li>
+                Url mapiranje za korisnika sa accountId: "user":
+                url:"https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html",
+                mappingString: "ErnyIY",
+                redirectType: 301
+            </li>
+         </ul>
+
+    </p>
+
+    <h2>Pokretanje aplikacije</h2>
+    <p>
+        Da bismo pokrenuli aplikaciju, potrebno je da se pozicioniramo unutar <b>target</b> foldera i izvršimo komandu:
+        <b>java -jar infobiptask-0.0.1-SNAPSHOT.jar</b>
+    </p>
+
+    <h2>Testiranje servisa</h2>
+    <p>Servise možemo testirati npr. pomoću alata Postman (https://www.getpostman.com/) ili kroz konzolu. <br/>
+        <b>Za authorizaciju se koristi Http basic.</b> <br/>
+        <i>U nastavku će biti dat opis korištenja servisa kroz <b>Postman alat</b>. Dakle, nakon instalacije i pokretanja Postmana, možemo sljedeće:</i>
+        <ul>
+            <li>
+                <b>1.1.1. Otvaranje account-a:</b> <br/>
+                1. Za request odaberemo metodu <b>POST</b> <br/>
+                2. U url polje unesemo: localhost:8080/account <br/>
+                3. Kliknemo na opciju <b>Body</b>, za tip podataka odaberemo opciju <b>JSON(application/json)</b>, te pošaljemo objekat u json formatu koji sadrži AccountId parametar i željenju vrijednost tog parametra,
+                npr. {"AccountId":"newUser"} <br/>
+                4. Zatim kliknemo na opciju <b>Send</b><br/>
+                5. Kao odgovor dobijemo JSON objekat koji sadrži informaciju o uspješnosti akcije, opis, te password u slučaju uspješnog dodavanja account-a.<br/>
+                <i><b>Napomena:</b> U slučaju da ne pošaljemo parametar AccountId, kao odgovor dobijamo response sa statusom 404 i odgovarajućim JSON objektom u kojem se nalazi opis statusa. Analogno se dešava i u slučaju da pošaljemo kao username prazan string ili ako pokušamo da se registrujemo sa već postojećim AccountId-em.</i>
+            </li>
+
+            <li>
+                <b>1.1.2. Registracija URL-ova:</b> <br/>
+                1. Za request odaberemo metodu <b>POST</b><br/>
+                2. U url polje unesemo: localhost:8080/register <br/>
+                3. Kliknemo na opciju <b>Authorization</b>, za opciju <b>Type</b> odaberemo <b>Basic Auth</b>, u polja Username i Password unesemo registrovani AccountId i password koji smo dobili prilikom registracije acoount-a.<br/>
+                Zatim kliknemo na opciju <b>Body</b> i odaberemo <b>JSON(application/json)</b> format, te pošaljemo objekat u json formatu koji sadrži url parametar i željenju vrijednost tog parametra,
+                a opcionalno mozemo poslati i redirectType parametar koji može imati vrijednost 301 ili 302.
+                npr. {"AccountId":"newUser"} <br/>
+                4. Kliknemo na opciju <b>Body</b>, za tip podataka odaberemo opciju <b>JSON(application/json)</b>, te pošaljemo objekat u json formatu koji sadrži AccountId parametar i željenju vrijednost tog parametra,
+                npr. {"url":"https://www.info.ba/ostalo/specijal/8532/spring-rest", "redirectType":301} <br/>
+                5. Zatim kliknemo na opciju <b>Send</b><br/>
+                6. Kao odgovor dobijemo JSON objekat koji sadrži informaciju o skraćenom url-u. Skraceni url zapravo predstavlja vrijednost parametra mappingString JSON objekta kojeg dobijemo kao odgovor.<br/>
+                <i>Na ovaj način će biti povezana url mapiranja i korisnik koji ih pravi.</i> <br/>
+                <i><b>Napomena:</b>
+                    U slučaju da pokušamo da izvršimo registraciju bez postavljanja Authorization header-a, dobit ćemo response sa HTTP statusom 401 Unauthorized i odgovarajućim JSON objektom sa porukom o statusu.
+                    U slučaju da ne pošaljemo parametar url, kao odgovor dobijamo response sa statusom 404 i odgovarajućim JSON objektom u kojem se nalazi opis statusa.
+                    Analogno se dešava i u slučaju da pošaljemo kao url prazan string. <br/>
+                    U slučaju da pošaljemo neku drugu vrijednost redirectType parametra koja je nije 301 | 302, dobit ćemo response sa HTTP statusom 400 i odgovarajućim JSON objektom sa porukom o opisu statusa.
+                </i>
+
+            </li>
+
+            <li>
+                <b>1.1.3. Dohvat statistike:</b> <br/>
+                1. Za request odaberemo metodu <b>GET</b> <br/>
+                2. U url polje unesemo: localhost:8080/statistic/{AccountId}, pri čemu {AccountId} treba biti isti kao Username korisnika čije podatke unosimo u opciji Authorization <br/>
+                3. Kliknemo na opciju <b>Authorization</b>, za opciju <b>Type</b> odaberemo <b>Basic Auth</b>, u polja Username i Password unesemo registrovani AccountId i password koji smo dobili prilikom registracije acoount-a.<br/>
+                4. Zatim kliknemo na opciju <b>Send</b><br/>
+                5. Kao odgovor JSON objekat, odnosno mapu koja sadrzi statistiku vezanu za mapiranja ovog korisnika. Dakle, svaki korisnik vidi statistiku mapiranja koje je on napravio.
+                <i><b>Napomena:</b> U slučaju da pokušamo pristupiti ovoj ruti prije nego što unesemo podatke za authorizaciju, dobit ćemo response sa HTTP statusom 401 i odgovarajućim JSON objektom sa porukom o opisu statusa.
+                Analogno se dobije i ukoliko unesemo {AccountId} različit od Username-a čije smo podatke unijeli pod opcijom Authorization.</i>
+            </li>
+
+            <li>
+                <b>1.2. Redirect </b> <br/>
+                Ovaj korak možemo testirati na način da unesemo skraćeni url u polje za url u browser-u ili kroz niz sljedećih koraka:<br/>
+                1. Za request odaberemo metodu GET <br/>
+                2. U url polje unesemo skraćeni url koji smo dobili kao mappingString prilikom registracije <br/>
+                3. Zatim kliknemo na opciju <b>Send</b><br/>
+                4. Kao rezultat zapravo dobijemo HTML kod originalne stranice, odnosno ako u browser unesemo skraćeni URL bit ćemo preusmjereni na odgovarajuću web stranicu.<br/>
+                <i><b>Napomena:</b> Sa svakim redirectom se vrši ažuriranje statistike, a to se može provjeriti ponovnim ponavljanjem koraka 1.1.3. </i> <br/>
+                <i>U slučaju da unesemo nepostojeći skraćeni url, dobit ćemo response sa HTTP statusom 400 i odgovarajućim JSON objektom sa porukom o opisu statusa. </i>
+            </li>
+        </ul>
+    </p>
+
+    <h2>Napomene:</h2>
+    <p>Za sada se generisanje skraćenih url-ova vrši na način da budu dužine 6 znakova, što znači da ovako možemo generisati 62^6 jedinstvenih stringova (odnosno mapiranja).
+        Također, provjerava se da li je jedan korisnik već napravio mapiranje za poslani link, te mu se u tom slučaju vraća postojeći skraćeni url za poslani url i
+        ne vrši se generisanje novog.
+        U općem slučaju bismo trebali pratiti kada se "potroši/iskoristi" svih 62^6 stringova(skraćenih url-ova), te vršiti brisanje mapiranja
+        npr. onih kojima se najrjeđe pristupa ili onih kojima se davno pristupalo i na taj način omogućiti generisanje novih jedinstvenih stringova za nove url-ove.
+        Međutim, trenutno taj mehanizam izlazi van okvira i obima ovog servisa.
+    </p>
+</body>
+</html>
